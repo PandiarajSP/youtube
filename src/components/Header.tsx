@@ -1,11 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
 import { useEffect, useState } from "react";
-import { YOUTUBE_SEARCH_API } from "../utils/constants";
+import { YOUTUBE_SEARCH_API, YOUTUBE_SEARCH_LIST_API } from "../utils/constants";
 import type { RootState } from "../utils/store";
 import { cacheResults } from "../utils/searchSlice";
+import { addVideos } from "../utils/videoSlice";
 
 const Header = () => {
+
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
@@ -37,8 +39,12 @@ const Header = () => {
             [searchQuery]: json[1]
         }))
     }
-    const handleSearchBtn = () => {
-          
+    const handleSearchClick = async () => {
+        let url = YOUTUBE_SEARCH_LIST_API.replace('q=', 'q=' + searchQuery);
+        let data = await fetch(url);
+        let json = await data.json();
+        console.log(json);
+        dispatch(addVideos(json.items));
     }
     return (
         <div className="grid grid-flow-col p-5 m-2 shadow-lg">
@@ -54,14 +60,14 @@ const Header = () => {
                         onFocus={() => setShowSuggestions(true)}
                         onBlur={() => setShowSuggestions(false)}
                     />
-                    <button className="border border-gray-400 p-2 rounded-r-full bg-gray-100" onClick={() => handleSearchBtn()}>Search</button>
+                    <button className="border border-gray-400 p-2 rounded-r-full bg-gray-100" onClick={() => handleSearchClick()}>Search</button>
                 </div>
             </div>
             {showSuggestions &&
                 <div className="fixed bg-white py-2 px-5 w-136 mt-12 ml-110 shadow-lg rounded-lg border border-gray-100">
                     <ul>
                         {
-                            suggestions.map((s) => <li key={s} className="py-2 px-3 hover:bg-gray-100 cursor-pointer">{s}</li>)
+                            suggestions.map((s) => <li key={s} className="py-2 px-3 hover:bg-gray-100 cursor-pointer" onClick={handleSearchClick}>{s}</li>)
                         }
                     </ul>
                 </div>}

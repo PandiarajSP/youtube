@@ -9,7 +9,8 @@ const VideoCard = ({ info }: any) => {
       <ul>
         <li className="font-bold py-2">{title}</li>
         <li>{channelTitle}</li>
-        <li>{statistics.viewCount} views</li>
+        {statistics && statistics.viewCount && <li>{statistics.viewCount} views</li>}
+
       </ul>
     </div>
   )
